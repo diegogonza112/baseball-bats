@@ -24,3 +24,4 @@ class Scraper:
         for z in file.open(self.find_abbreviation() + '2004.ROS').readlines():
             if all(j in z.decode("utf-8") for j in self.player):
                 return z.decode("utf-8")[:8]
+
