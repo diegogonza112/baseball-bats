@@ -1,10 +1,11 @@
 from scrape_retrosheet import Scraper
 
-x = input("Type a player in the form 'Player Player'")
-y = input(f"Type the year {x} played in")
-z = input(f"Type the team {x} played for")
+x = input("Type a player and season in the form 'Player Player YEAR',")
 
-sr = Scraper(x, y, z)
+z = x.split()
+x = z[0] + z[1]
+y = z[-1]
+sr = Scraper(x, y)
 
 print(sr.find_player_id())
 print(sr.find_abbreviation())
