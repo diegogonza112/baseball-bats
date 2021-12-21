@@ -1,6 +1,6 @@
 import zipfile
 from io import BytesIO
-from typing import List
+from typing import Dict, List
 from urllib.request import urlopen
 
 team_abr_url = 'https://www.retrosheet.org/TEAMABR.TXT'
@@ -31,8 +31,8 @@ class Scraper:
             if all(j in z.decode("utf-8") for j in self.player):
                 return z.decode("utf-8")[:8]
 
-    def find_every_plate_appearance(self) -> List[str]:
-        plate_a = []
+    def find_every_plate_appearance(self) -> Dict:
+        plate_a = {}
         handle = urlopen(self.event_url)
         file = zipfile.ZipFile(BytesIO(handle.read()))
         for i in file.namelist():
@@ -40,7 +40,13 @@ class Scraper:
                 if i.endswith("EVN") or i.endswith("EVA"):
                     ab = z.decode("utf-8").split(',')
                     if ab[-2] and self.playerID in ab and ab[0] == 'play':
-                        plate_a.append(ab[-2])
+                        x = ab[-1].replace('/', "*").replace(".", "*").\
+                            replace("+", "*").replace("\r", "*").\
+                            replace("\n", "*")
+
+                        plate_a[ab[-2]] = x.split('*')[0]
         return plate_a
 
 
+sr = Scraper('Barry bonds', '2004')
+print(sr.find_every_plate_appearance())
