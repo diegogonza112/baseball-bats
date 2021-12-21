@@ -5,13 +5,21 @@ from scrape_retrosheet import Scraper
 
 class StatisticsCalculator:
 
-    def __init__(self, pa_list: Dict) -> None:
-        self.pa_list = {}
-        for i in pa_list:
-            j = i.replace('*', '').replace('>', '').\
-                replace('.', '').replace('+', '').\
-                replace('1', '').replace('2', '').replace('3', '')
+    def __init__(self, pa_list: List) -> None:
+        self.pa_list = pa_list
 
-            self.pa_list[j] = pa_list[i]
+    def count_iw(self) -> int:
+        count = 0
+        for i in self.pa_list:
+            if i[-1] == 'IW':
+                count += 1
+        return count
 
+
+sr = Scraper('Barry bonds', '2004')
+x = sr.find_every_plate_appearance()
+sc = StatisticsCalculator(x)
+print(len(x))
+print(x)
+print(sc.count_iw())
 

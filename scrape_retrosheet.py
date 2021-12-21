@@ -31,8 +31,8 @@ class Scraper:
             if all(j in z.decode("utf-8") for j in self.player):
                 return z.decode("utf-8")[:8]
 
-    def find_every_plate_appearance(self) -> Dict:
-        plate_a = {}
+    def find_every_plate_appearance(self) -> List:
+        plate_a = []
         handle = urlopen(self.event_url)
         file = zipfile.ZipFile(BytesIO(handle.read()))
         for i in file.namelist():
@@ -40,13 +40,23 @@ class Scraper:
                 if i.endswith("EVN") or i.endswith("EVA"):
                     ab = z.decode("utf-8").split(',')
                     if ab[-2] and self.playerID in ab and ab[0] == 'play':
-                        x = ab[-1].replace('/', "*").replace(".", "*").\
-                            replace("+", "*").replace("\r", "*").\
+                        x = ab[-1].replace('/', "*").replace(".", "*"). \
+                            replace("+", "*").replace("\r", "*"). \
                             replace("\n", "*")
 
-                        plate_a[ab[-2]] = x.split('*')[0]
-        return plate_a
+                        plate_a.append((ab[-2], x.split('*')[0]))
+        return clean_data(plate_a)
 
 
-sr = Scraper('Barry bonds', '2004')
-print(sr.find_every_plate_appearance())
+def clean_data(pa_list):
+    clean_list = []
+    for i in pa_list:
+        j = i[0].replace('*', '').replace('>', ''). \
+            replace('.', '').replace('+', ''). \
+            replace('1', '').replace('2', '').replace('3', '')
+
+        clean_list.append((j, i[-1]))
+    return clean_list
+
+
+
