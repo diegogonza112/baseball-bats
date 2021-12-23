@@ -1,6 +1,6 @@
-from typing import Dict, List
+from typing import List
 
-from scrape_retrosheet import Scraper
+from retrosheet_utils.scrape_retrosheet import Scraper
 
 
 class StatisticsCalculator:

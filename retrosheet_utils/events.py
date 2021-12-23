@@ -1,17 +1,18 @@
+from retrosheet_utils.scraper import Scraper
+
 import zipfile
 from io import BytesIO
-from typing import Dict, List
+from typing import List
 from urllib.request import urlopen
 
-team_abr_url = 'https://www.retrosheet.org/TEAMABR.TXT'
 
-
-class Scraper:
-
+class Events(Scraper):
     def __init__(self, player: str, year: str) -> None:
+        super().__init__(year)
         self.player = player.title().split()
-        self.year = year
-        self.event_url = 'https://www.retrosheet.org/events/' + year + 'eve.zip'
+
+        self.event_url = Scraper(year).event_url
+
         self.team = self.find_abbreviation()
         self.playerID = self.find_player_id()
 
@@ -27,7 +28,7 @@ class Scraper:
     def find_player_id(self) -> str:
         handle = urlopen(self.event_url)
         file = zipfile.ZipFile(BytesIO(handle.read()))
-        for z in file.open(self.team + '2004.ROS').readlines():
+        for z in file.open(self.team + self.year+'.ROS').readlines():
             if all(j in z.decode("utf-8") for j in self.player):
                 return z.decode("utf-8")[:8]
 
@@ -45,18 +46,15 @@ class Scraper:
                             replace("\n", "*")
 
                         plate_a.append((ab[-2], x.split('*')[0]))
-        return clean_data(plate_a)
+        return self.clean_data(plate_a)
 
+    @staticmethod
+    def clean_data(pa_list):
+        clean_list = []
+        for i in pa_list:
+            j = i[0].replace('*', '').replace('>', ''). \
+                replace('.', '').replace('+', ''). \
+                replace('1', '').replace('2', '').replace('3', '')
 
-def clean_data(pa_list):
-    clean_list = []
-    for i in pa_list:
-        j = i[0].replace('*', '').replace('>', ''). \
-            replace('.', '').replace('+', ''). \
-            replace('1', '').replace('2', '').replace('3', '')
-
-        clean_list.append((j, i[-1]))
-    return clean_list
-
-
-
+            clean_list.append((j, i[-1]))
+        return clean_list

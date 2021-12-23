@@ -1,4 +1,4 @@
-from scrape_retrosheet import Scraper
+from retrosheet_utils.scrape_retrosheet import Scraper
 
 x = input("Type a player and season in the form 'Player Player YEAR',")
 
