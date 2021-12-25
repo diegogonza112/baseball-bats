@@ -14,15 +14,13 @@ class Events(Scraper):
         self.event_url = Scraper(year).event_url
 
         self.team = self.find_abbreviation()
-        self.playerID = self.find_player_id()
 
     def find_abbreviation(self) -> str:
         handle = urlopen(self.event_url)
         file = zipfile.ZipFile(BytesIO(handle.read()))
         for i in file.namelist():
             for z in file.open(i).readlines():
-                if i.endswith("ROS") and all(j in z.decode("utf-8") for j in
-                                             self.player):
+                if all(j in z.decode("utf-8") for j in self.player):
                     return z.decode("utf-8").split(",")[-2]
 
     def find_player_id(self) -> str:
@@ -40,7 +38,8 @@ class Events(Scraper):
             for z in file.open(i).readlines():
                 if i.endswith("EVN") or i.endswith("EVA"):
                     ab = z.decode("utf-8").split(',')
-                    if ab[-2] and self.playerID in ab and ab[0] == 'play':
+                    if ab[-2] and self.find_player_id() in ab and ab[0] == \
+                            'play':
                         x = ab[-1].replace('/', "*").replace(".", "*"). \
                             replace("+", "*").replace("\r", "*"). \
                             replace("\n", "*")
